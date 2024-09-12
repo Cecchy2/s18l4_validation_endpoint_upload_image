@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOError;
+import java.io.IOException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -56,6 +59,11 @@ public class AutoriController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void findByIdAndDelete (@PathVariable UUID autoreId){
         autoriService.findByIdAndDelete(autoreId);
+    }
+
+    @PatchMapping("/{autoreId}/avatar")
+    public void uploadAvatar(@RequestParam("avatar")MultipartFile image) throws IOException{
+        this.autoriService.uploadImage(image);
     }
 
 }

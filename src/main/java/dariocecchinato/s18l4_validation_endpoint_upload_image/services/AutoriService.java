@@ -1,6 +1,8 @@
 package dariocecchinato.s18l4_validation_endpoint_upload_image.services;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.Autore;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.BadRequestException;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.NotFoundException;
@@ -12,13 +14,17 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.UUID;
 
 @Service
 public class AutoriService {
     @Autowired
     private AutoriRepository autoriRepository;
+    @Autowired
+    private Cloudinary cloudinaryUploader;
 
 
 public Page<Autore> findAll(int page, int size, String sortby){
@@ -56,5 +62,10 @@ public Autore findAutoreByIdAndUpdate(UUID autoreId, Autore updatedBody){
 public void findByIdAndDelete(UUID autoreId){
    Autore found = this.findAutoreById(autoreId);
    autoriRepository.delete(found);
+}
+
+public void uploadImage(MultipartFile file) throws IOException{
+    String url = (String) cloudinaryUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
+    System.out.println("URL " + url);
 }
 }
