@@ -37,8 +37,7 @@ public class AutoriController {
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
         }else{
-            Autore newAutore =this.autoriService.save(body);
-            return newAutore;
+            return this.autoriService.save(body);
         }
 
     }

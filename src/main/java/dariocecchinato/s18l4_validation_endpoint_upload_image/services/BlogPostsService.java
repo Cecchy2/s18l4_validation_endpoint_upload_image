@@ -3,7 +3,7 @@ package dariocecchinato.s18l4_validation_endpoint_upload_image.services;
 
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.Autore;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.BlogPost;
-import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.PayloadBodyBlogPost;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.payloads.PayloadBodyBlogPostDTO;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.NotFoundException;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.repositories.BlogPostsRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +30,12 @@ public class BlogPostsService {
         return this.blogPostsRepository.findAll(pageable);
     }
 
-    public BlogPost saveBlogPost(PayloadBodyBlogPost body){
+    public BlogPost saveBlogPost(PayloadBodyBlogPostDTO body){
 
-        Autore autore = autoriService.findAutoreById(UUID.fromString(body.getAutoreId()));
-        BlogPost blogPost = new BlogPost(body.getCategoria(),body.getTitolo(),body.getCover(),body.getContenuto(), body.getTempoDiLettura());
+        Autore autore = autoriService.findAutoreById(UUID.fromString(body.autoreId()));
+        BlogPost blogPost = new BlogPost(body.categoria(),body.titolo(),"https://fastly.picsum.photos/id/848/200/300.jpg?hmac=cNClhUSP4IM6ZT6RTqdeCOLWYEJYBNXaqdflgf_EqD8",body.contenuto(), body.tempoDiLettura());
         blogPost.setAutore(autore);
-        blogPost.setCover("https://fastly.picsum.photos/id/848/200/300.jpg?hmac=cNClhUSP4IM6ZT6RTqdeCOLWYEJYBNXaqdflgf_EqD8");
+
 
         return blogPostsRepository.save(blogPost);
     }
@@ -44,13 +44,13 @@ public class BlogPostsService {
         return this.blogPostsRepository.findById(blogPostId).orElseThrow(()->new NotFoundException(blogPostId));
     }
 
-    public BlogPost findByIdAndUpdate (UUID blogPostId, PayloadBodyBlogPost body){
+    public BlogPost findByIdAndUpdate (UUID blogPostId, PayloadBodyBlogPostDTO body){
         BlogPost found = this.blogPostsRepository.findById(blogPostId).orElseThrow(()->new NotFoundException(blogPostId));
-        found.setTitolo(body.getTitolo());
-        found.setCategoria(body.getCategoria());
+        found.setTitolo(body.titolo());
+        found.setCategoria(body.categoria());
         found.setCover("https://fastly.picsum.photos/id/848/200/300.jpg?hmac=cNClhUSP4IM6ZT6RTqdeCOLWYEJYBNXaqdflgf_EqD8");
-        found.setContenuto(body.getContenuto());
-        found.setTempoDiLettura(body.getTempoDiLettura());
+        found.setContenuto(body.contenuto());
+        found.setTempoDiLettura(body.tempoDiLettura());
         return found;
     }
 

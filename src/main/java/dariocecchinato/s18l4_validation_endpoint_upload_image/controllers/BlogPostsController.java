@@ -2,14 +2,18 @@ package dariocecchinato.s18l4_validation_endpoint_upload_image.controllers;
 
 
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.BlogPost;
-import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.PayloadBodyBlogPost;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.BadRequestException;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.payloads.PayloadBodyBlogPostDTO;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.services.BlogPostsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/blogPosts")
@@ -26,8 +30,14 @@ public class BlogPostsController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public BlogPost creaBlog(@RequestBody PayloadBodyBlogPost body){
-        return blogPostsService.saveBlogPost(body);
+    public BlogPost creaBlog(@RequestBody @Validated PayloadBodyBlogPostDTO body, BindingResult validationResult){
+        if (validationResult.hasErrors()){
+            String messages= validationResult.getAllErrors().stream().map(objectError -> objectError.getDefaultMessage()).collect(Collectors.joining(". "));
+            throw new BadRequestException("Errori nel Payload. " +messages);
+        }else{
+            return this.blogPostsService.saveBlogPost(body);
+        }
+
     }
 
     @GetMapping("/{blogPostId}")
@@ -36,7 +46,7 @@ public class BlogPostsController {
     }
 
     @PutMapping("/{blogPostId}")
-    public BlogPost getBlogByIdAndUpdate(@PathVariable UUID blogPostId, @RequestBody PayloadBodyBlogPost body){
+    public BlogPost getBlogByIdAndUpdate(@PathVariable UUID blogPostId, @RequestBody PayloadBodyBlogPostDTO body){
         return blogPostsService.findByIdAndUpdate(blogPostId,body);
     }
 
