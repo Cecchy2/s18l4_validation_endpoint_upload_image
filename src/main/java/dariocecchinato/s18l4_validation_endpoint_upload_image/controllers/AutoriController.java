@@ -2,13 +2,18 @@ package dariocecchinato.s18l4_validation_endpoint_upload_image.controllers;
 
 
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.Autore;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.BadRequestException;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.payloads.AutorePayloadDTO;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.services.AutoriService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/autori")
@@ -25,8 +30,16 @@ public class AutoriController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Autore save(@RequestBody Autore body){
-        return this.autoriService.save(body);
+    public Autore save(@RequestBody @Validated AutorePayloadDTO body, BindingResult validationResult){
+        if (validationResult.hasErrors()){
+            String messages = validationResult.getAllErrors().stream()
+                    .map(objectError -> objectError.getDefaultMessage())
+                    .collect(Collectors.joining(". "));
+            throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
+        }else{
+            return new Autore(body.nome(), body.cognome(), body.email(), body.dataDiNascita(),"https://ui-avatars.com/api/?name="+ body.nome()+ "+" + body.cognome());
+        }
+
     }
 
     @GetMapping("/{autoreId}")

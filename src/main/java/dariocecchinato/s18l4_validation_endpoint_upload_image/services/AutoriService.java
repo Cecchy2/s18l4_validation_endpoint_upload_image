@@ -4,6 +4,7 @@ package dariocecchinato.s18l4_validation_endpoint_upload_image.services;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.entities.Autore;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.BadRequestException;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.exceptions.NotFoundException;
+import dariocecchinato.s18l4_validation_endpoint_upload_image.payloads.AutorePayloadDTO;
 import dariocecchinato.s18l4_validation_endpoint_upload_image.repositories.AutoriRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -26,11 +27,13 @@ public Page<Autore> findAll(int page, int size, String sortby){
     return this.autoriRepository.findAll(pageable);
 }
 
-public Autore save(Autore body){
-   if (this.autoriRepository.existsByEmail(body.getEmail())) {throw new BadRequestException("L' email" + body.getEmail() + " è già in uso");
+public Autore save(AutorePayloadDTO body){
+   if (this.autoriRepository.existsByEmail(body.email())) {throw new BadRequestException("L' email" + body.email() + " è già in uso");
    } else {
-       body.setAvatar("https://ui-avatars.com/api/?name="+ body.getNome()+ "+" + body.getCognome());
-       return this.autoriRepository.save(body);}
+       String avatar = "https://ui-avatars.com/api/?name="+body.nome()+"+"+body.cognome();
+       Autore newAutore = new Autore(body.nome(), body.cognome(), body.email(), body.dataDiNascita(),avatar);
+               return this.autoriRepository.save(newAutore);
+       }
 }
 
 public Autore findAutoreById(UUID autoreId){
