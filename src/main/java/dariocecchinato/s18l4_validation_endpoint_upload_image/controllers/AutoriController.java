@@ -37,7 +37,8 @@ public class AutoriController {
                     .collect(Collectors.joining(". "));
             throw new BadRequestException("Ci sono stati errori nel payload. " + messages);
         }else{
-            return new Autore(body.nome(), body.cognome(), body.email(), body.dataDiNascita(),"https://ui-avatars.com/api/?name="+ body.nome()+ "+" + body.cognome());
+            Autore newAutore =this.autoriService.save(body);
+            return newAutore;
         }
 
     }
