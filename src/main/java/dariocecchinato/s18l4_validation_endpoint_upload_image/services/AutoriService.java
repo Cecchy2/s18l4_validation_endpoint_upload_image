@@ -41,6 +41,9 @@ public Autore save(AutorePayloadDTO body){
                return this.autoriRepository.save(newAutore);
        }
 }
+    public Autore saveAutore(Autore autore) {
+        return this.autoriRepository.save(autore);
+    }
 
 public Autore findAutoreById(UUID autoreId){
    return this.autoriRepository.findById(autoreId).orElseThrow(()->new NotFoundException(autoreId));
@@ -64,8 +67,9 @@ public void findByIdAndDelete(UUID autoreId){
    autoriRepository.delete(found);
 }
 
-public void uploadImage(MultipartFile file) throws IOException{
+public String uploadImage(MultipartFile file) throws IOException{
     String url = (String) cloudinaryUploader.uploader().upload(file.getBytes(), ObjectUtils.emptyMap()).get("url");
     System.out.println("URL " + url);
+    return url;
 }
 }

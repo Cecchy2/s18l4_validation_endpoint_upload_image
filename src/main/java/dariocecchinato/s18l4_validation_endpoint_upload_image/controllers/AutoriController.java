@@ -62,8 +62,14 @@ public class AutoriController {
     }
 
     @PatchMapping("/{autoreId}/avatar")
-    public void uploadAvatar(@RequestParam("avatar")MultipartFile image) throws IOException{
-        this.autoriService.uploadImage(image);
+    public void uploadAvatar(@PathVariable UUID autoreId, @RequestParam("avatar")MultipartFile image) throws IOException{
+        String avatarUrl = this.autoriService.uploadImage(image);
+        Autore autore = autoriService.findAutoreById(autoreId);
+        autore.setAvatar(avatarUrl);
+        autoriService.saveAutore(autore);
+
+
+
     }
 
 }
